@@ -24,6 +24,13 @@
 #include <unistd.h>                    /* unix standard functions             */
 #include <string.h>                    /* text handling functions             */
 #include <pthread.h>                   /* libraries for thread handling       */
+#include <sys/types.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <libgen.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <errno.h>
 
 /* -------------------------------------------------------------------------- */
 /* global definitions                                                         */
@@ -172,7 +179,7 @@ main()
     /* ---------------------------------------------------------------------- */
     /* Creation of thread pool that will check for new mssages to process     */
     /* ---------------------------------------------------------------------- */
-    for (i=0; i<MAX_THREADS; ++i)
+    for (i=0; i<MAX_THREADS-1; ++i)
       iret1[i] = pthread_create( &(thread1[i]), NULL, send_message, (void *)(&sfd));     
     
     /* ---------------------------------------------------------------------- */
@@ -180,7 +187,7 @@ main()
     /* "total exit" are received by a member of the chat                      */
     /* ---------------------------------------------------------------------- */
     lenght = sizeof(struct sockaddr);
-    while (strcmp(message.data_text,"total exit") != 0)
+    while (strcmp(message.data_text,"shutdown") != 0)
       {
         /* first we read the message sent from any client                     */
         read_char = recvfrom(sfd,(struct data *)&(message),sizeof(struct data),0,(struct sockaddr *)&(sock_write),&(lenght));
@@ -215,6 +222,10 @@ main()
                 part_list[message.chat_id].chat_id = -1;
 		--participants;
               }
+            else if(strcmp(message.data_text,"remote_dir")==0)
+            {
+               iret1[4] = pthread_create( &(thread1[4]), NULL,""   , (void *)(&sfd));//agregar nombre de funcion de recibimiento de archivo, recibimiento de parmetros en funcion debe ser void
+            }
             else
               sprintf(text1,"[%s]:[%s]",part_list[message.chat_id].alias, message.data_text);
           
