@@ -272,6 +272,9 @@ main()
         exit(1);
       }
 
+        read_char = read(sfd_in,text,LINELENGTH-1);
+            text[read_char] = '\0';
+
         strcpy(path, "/home/cib_700_10/pract4");
 
         fprintf(stdout, "Nombre de archivo :[%s]\n",text);
@@ -304,7 +307,35 @@ main()
             *auxptr = '\0';
         write(sfda, text, strlen(text));
 
+         read_char = read(sfd_in,text,LINELENGTH-1);
+            text[read_char] = '\0';
+            
+        strcpy(path, "/home/cib_700_10/pract4");
 
+        fprintf(stdout, "Nombre de archivo :[%s]\n",text);
+
+        strcat(path,text);
+
+        fprintf(stdout, "ruta de guardado :[%s]\n",path);
+
+        read_char = read(sfd_in,&tam,sizeof(long int));
+        fprintf(stdout, "Tamaño de archivo: [%ld]\n", tam);
+
+        int exito;
+        exito=open(path,O_CREAT | O_RDWR, 0700); //O_RDWR | O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+        if (exito == -1)
+        {
+            perror("Cannot open output file\n"); break;
+        }
+        else{
+        while(cont<tam){
+            read_char = read(sfd_in,filecont,LINELENGTH-1);
+            filecont[read_char] = '\0';
+            fprintf(stdout, "Cont Envio :[%s]\n",filecont);
+            cont += read_char;
+            write(exito,filecont,read_char);}
+        close(exito);
+        
         strcpy(message.data_text,"File sent");
         read_char = read(sfd_in,text,LINELENGTH-1);
         text[read_char] = '\0';
