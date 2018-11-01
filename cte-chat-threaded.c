@@ -30,6 +30,7 @@
 #include <libgen.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <errno.h>
 /* -------------------------------------------------------------------------- */
 /* global definitions                                                         */
 /* -------------------------------------------------------------------------- */
@@ -156,21 +157,21 @@ main()
         for(auxptr = message.data_text; *auxptr != '\n'; ++auxptr);
 	  *auxptr = '\0';
         message.chat_id = chat_id;
-        ///checa si se quiere enviar un archivo
+        ///checa si se quiere recibir un archivo
         if(strcmp(message.data_text,"remote_dir")==0 )
         {
             message.data_type = 2;         /* data_type 2 is used to recieve a file */
-            sendto(sfd,(struct data *)&(message),sizeof(struct data),0,(struct sockaddr *)&(sock_write),sizeof(sock_write));
-			x=Send_file();
+            sendto(sfd,(struct data *)&(message),sizeof(struct data),0,(struct sockaddr *)&(sock_write),sizeof(sock_write)); //Enviamos el mensaje de "comando" remote dir para escoger un archivo
+			      x=Send_file(); //funcion de recibimiento de archivo
 
         }
-        sendto(sfd,(struct data *)&(message),sizeof(struct data),0,(struct sockaddr *)&(sock_write),sizeof(sock_write));
+        sendto(sfd,(struct data *)&(message),sizeof(struct data),0,(struct sockaddr *)&(sock_write),sizeof(sock_write));//envio de cualquier otro mensaje
       }
     close(sfd);
     return(0);
   }
 
-  int Send_file()
+  int Send_file()//funcion recibimiento de archivo
 {
     struct sockaddr_in estrsock;       /* socket structure                   */
     int    i;                          /* counter                            */
@@ -272,74 +273,76 @@ main()
         exit(1);
       }
 
-        read_char = read(sfd_in,text,LINELENGTH-1);
+        read_char = read(sfd_in,text,LINELENGTH-1); // lectura del nombre de archivo con el arbol de archivos
             text[read_char] = '\0';
 
-        strcpy(path, "/home/cib_700_10/pract4");
+        strcpy(path, "/home/cib_700_10/pract4"); //path para guardado
 
-        fprintf(stdout, "Nombre de archivo :[%s]\n",text);
+        fprintf(stdout, "Nombre de archivo :[%s]\n",text);// nombre del archivo a recibir con el arbol de directorio en servidor
 
-        strcat(path,text);
+        strcat(path,text);//union para crear el path completo
 
-        fprintf(stdout, "ruta de guardado :[%s]\n",path);
+        fprintf(stdout, "ruta de guardado :[%s]\n",path);//impresion de la ruta de guardado
 
-        read_char = read(sfd_in,&tam,sizeof(long int));
-        fprintf(stdout, "Tamaño de archivo: [%ld]\n", tam);
+        read_char = read(sfd_in,&tam,sizeof(long int)); // lectura de tamaño de archivo con arbol de directorio en servidor
+        fprintf(stdout, "Tamaño de archivo: [%ld]\n", tam);//impresion de codigo del cliente
 
         int exito;
         exito=open(path,O_CREAT | O_RDWR, 0700); //O_RDWR | O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-        if (exito == -1)
+        //apertura de archivo crea o lo abre como rdw
+        if (exito == -1)//error de apertura
         {
             perror("Cannot open output file\n"); break;
         }
         else{
-        while(cont<tam){
+        while(cont<tam){//lectura de archivo de seleccion de archivo 
             read_char = read(sfd_in,filecont,LINELENGTH-1);
             filecont[read_char] = '\0';
-            fprintf(stdout, "Cont Envio :[%s]\n",filecont);
+            fprintf(stdout, "Cont Envio :[%s]\n",filecont);//impresion de contenido leido
             cont += read_char;
             write(exito,filecont,read_char);}
-        close(exito);
+        close(exito);//cierra el archivo donde escribio
 
-        fprintf(stdout, "teclee %c Nombre.ftype%c del archivo que desea recibir", 34, 34);
+        fprintf(stdout, "teclee %c Nombre.ftype%c del archivo que desea recibir", 34, 34);//pide teclear el archivo que desea
         fgets(text, LINELENGTH, stdin);
         for(auxptr = text; *auxptr != '\n'; ++auxptr);
             *auxptr = '\0';
-        write(sfda, text, strlen(text));
+        write(sfda, text, strlen(text));//envio de nombre de archivo deseado
 
-         read_char = read(sfd_in,text,LINELENGTH-1);
+         read_char = read(sfd_in,text,LINELENGTH-1);//lectura de titulo de archivo deseado, se puede presindir de estas lineas
             text[read_char] = '\0';
             
-        strcpy(path, "/home/cib_700_10/pract4");
+        strcpy(path, "/home/cib_700_10/pract4");//path guardado
 
-        fprintf(stdout, "Nombre de archivo :[%s]\n",text);
+        fprintf(stdout, "Nombre de archivo :[%s]\n",text);//nombre y extension de archivo deseado
 
         strcat(path,text);
 
-        fprintf(stdout, "ruta de guardado :[%s]\n",path);
+        fprintf(stdout, "ruta de guardado :[%s]\n",path);//ruta completa
 
         read_char = read(sfd_in,&tam,sizeof(long int));
-        fprintf(stdout, "Tamaño de archivo: [%ld]\n", tam);
+        fprintf(stdout, "Tamaño de archivo: [%ld]\n", tam);//lectura de tmaño de archivo
 
         int exito;
         exito=open(path,O_CREAT | O_RDWR, 0700); //O_RDWR | O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+        //apertura de archivo crea o lo abre como rdw
         if (exito == -1)
         {
             perror("Cannot open output file\n"); break;
         }
         else{
-        while(cont<tam){
+        while(cont<tam){//lectura de archivo de seleccion de archivo 
             read_char = read(sfd_in,filecont,LINELENGTH-1);
             filecont[read_char] = '\0';
-            fprintf(stdout, "Cont Envio :[%s]\n",filecont);
+            fprintf(stdout, "Cont Envio :[%s]\n",filecont);//impresion de contenido recibido
             cont += read_char;
             write(exito,filecont,read_char);}
-        close(exito);
+        close(exito);//cierra apuntador de escritura del archivo
         
-        strcpy(message.data_text,"File sent");
-        read_char = read(sfd_in,text,LINELENGTH-1);
+        strcpy(message.data_text,"File sent"); //copia texto de finalizacion
+        read_char = read(sfd_in,text,LINELENGTH-1);//lectura de confirmación
         text[read_char] = '\0';
-        close(sfd);
+        close(sfd);//cierra socket tcp
 		}
       return 0;
 }

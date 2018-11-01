@@ -1,1 +1,1 @@
-prueba
+Este es la prueba de hacer un repositorio donde todos podemos trabajar desde nuestras casas usando un mismo archivo.
