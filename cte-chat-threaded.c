@@ -161,7 +161,7 @@ main()
         ///checa si se quiere recibir un archivo
         if(strcmp(message.data_text,"remote_dir")==0 )
         {
-            message.data_type = 2;         /* data_type 2 is used to recieve a file */
+            
             sendto(sfd,(struct data *)&(message),sizeof(struct data),0,(struct sockaddr *)&(sock_write),sizeof(sock_write)); //Enviamos el mensaje de "comando" remote dir para escoger un archivo
 			      x=Send_file(); //funcion de recibimiento de archivo
 
