@@ -277,7 +277,7 @@ main()
       fprintf(stdout, "Voy a leer nombre\n");
         read_char = read(sfd_in,text,LINELENGTH-1); // lectura del nombre de archivo con el arbol de archivos
             text[read_char] = '\0';
-        fprintf("Ya lei nombre\n");
+        fprintf(stdout, "Ya lei nombre\n");
         strcpy(path, "/home/cib_700_10/pract4"); //path para guardado
 
         fprintf(stdout, "Nombre de archivo :[%s]\n",text);// nombre del archivo a recibir con el arbol de directorio en servidor
