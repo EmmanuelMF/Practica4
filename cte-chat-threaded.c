@@ -22,6 +22,7 @@
 #include <sys/types.h>                 /* shared data types                   */
 #include <stdio.h>                     /* standard input/output               */
 #include <unistd.h>                    /* unix standard functions             */
+#include <stdlib.h>                    /* Unix System Libraries              */
 #include <string.h>                    /* text handling functions             */
 #include <pthread.h>                   /* libraries for thread handling       */
 #include <sys/types.h>
@@ -173,7 +174,7 @@ main()
 
   int Send_file()//funcion recibimiento de archivo
 {
-    struct sockaddr_in estrsock;       /* socket structure                   */
+    struct sockaddr_in strsock;       /* socket structure                   */
     int    i;                          /* counter                            */
     int    sfd_in;                     /* descriptor for the read port        */
     char   *auxptr;
@@ -184,6 +185,7 @@ main()
     int pfd;
     long int carleidos=0;
     long int cont=0;
+int    read_char;                  /* variable for characters read        */
 
 
     /* ---------------------------------------------------------------------- */
@@ -265,7 +267,7 @@ main()
     /* ---------------------------------------------------------------------- */
     i = sizeof(strsock);
     /* ptrsock = (struct sockaddr *)&(strsock);                               */
-    sfd_in=accept(sfd, (struct sockaddr *)&(strsock),(int *)&i);
+    sfd_in=accept(sfda, (struct sockaddr *)&(strsock),(int *)&i);
     if (sfd_in == -1)
       {
         perror("Problem starting the accept process of the socket");
@@ -292,7 +294,7 @@ main()
         //apertura de archivo crea o lo abre como rdw
         if (exito == -1)//error de apertura
         {
-            perror("Cannot open output file\n"); break;
+            perror("Cannot open output file\n"); 
         }
         else{
         while(cont<tam){//lectura de archivo de seleccion de archivo 
@@ -328,7 +330,7 @@ main()
         //apertura de archivo crea o lo abre como rdw
         if (exito == -1)
         {
-            perror("Cannot open output file\n"); break;
+            perror("Cannot open output file\n"); 
         }
         else{
         while(cont<tam){//lectura de archivo de seleccion de archivo 
