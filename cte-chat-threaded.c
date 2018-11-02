@@ -305,7 +305,7 @@ main()
             write(exito,filecont,read_char);}
         close(exito);//cierra el archivo donde escribio
 
-        fprintf(stdout, "teclee %c Nombre.ftype%c del archivo que desea recibir", 34, 34);//pide teclear el archivo que desea
+        fprintf(stdout, "teclee %c Nombre.ftype%c del archivo que desea recibir\n", 34, 34);//pide teclear el archivo que desea
         fgets(text, LINELENGTH, stdin);
         for(auxptr = text; *auxptr != '\n'; ++auxptr);
             *auxptr = '\0';

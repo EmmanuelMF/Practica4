@@ -45,7 +45,7 @@
 #define LINELENGTH 4096
 #define BUF_SIZE 4096
 #define min(a,b) ((a) < (b) ? a : b)
-int    sfda;
+int    sfd_in;
 char   text[LINELENGTH];
 
 struct stat archivo;               /*ESTRUTURA INFO ARCHIVO               */
@@ -202,6 +202,7 @@ void *envia (void *ptr){
                 //fgets(text, LINELENGTH, stdin);
             }
     }
+    close(pfd);
 
             read_char= read(sfda,text,LINELENGTH-1);//lectura de titulo de archivo deseado, se puede presindir de estas lineas
             text[read_char] = '\0';
@@ -212,6 +213,8 @@ void *envia (void *ptr){
                 strcat(path,text);
 
                 fprintf(stdout, "ruta de enviado :[%s]\n",path);
+
+                pfd = open(path, O_RDWR)) == -1
 
                 if(stat(path,&archivo)== 0) //EXITO
 		{
@@ -235,7 +238,7 @@ void *envia (void *ptr){
 
 			while(cont<tamf){
                 sleep(1);
-                carleidos=read(pfd,tex_f,BUF_SIZE);
+                carleidos=read(sfd_in,tex_f,BUF_SIZE);
                 fprintf(stdout, "[%s], [%ld] ", tex_f, carleidos);
                 write(sfda,tex_f,carleidos);
                 cont += carleidos;
@@ -243,6 +246,7 @@ void *envia (void *ptr){
                 //printf("$ teclee enter para seguir");
                 //fgets(text, LINELENGTH, stdin);
             }
+            close(pfd);
     }
     close (sfda);
    }
