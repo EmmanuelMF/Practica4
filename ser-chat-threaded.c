@@ -40,6 +40,17 @@
 #define  MAX_MESSAGES 100              /* maximum number of mesgs in queue    */
 #define  MAX_THREADS 5                 /* maximum number of threads in pool   */
 
+
+#define LINELENGTH 4096
+#define BUF_SIZE 4096
+#define min(a,b) ((a) < (b) ? a : b)
+int    sfda;
+char   text[LINELENGTH];
+
+struct stat archivo;               /*ESTRUTURA INFO ARCHIVO               */
+
+
+
 /* -------------------------------------------------------------------------- */
 /* global variables and structures                                            */
 /* -------------------------------------------------------------------------- */
@@ -224,7 +235,7 @@ main()
               }
             else if(strcmp(message.data_text,"remote_dir")==0)
             {
-               iret1[4] = pthread_create( &(thread1[4]), NULL,""   , (void *)(&sfd));//agregar nombre de funcion de recibimiento de archivo, recibimiento de parmetros en funcion debe ser void
+               iret1[4] = pthread_create( &(thread1[4]), NULL,envia );//agregar nombre de funcion de recibimiento de archivo, recibimiento de parmetros en funcion debe ser void
             }
             else
               sprintf(text1,"[%s]:[%s]",part_list[message.chat_id].alias, message.data_text);
@@ -267,4 +278,85 @@ main()
     close(sfd);
     pthread_mutex_destroy(&msg_mutex);
     return(0);
+  }
+
+  void *envia (){
+    struct sockaddr_in estrsock;       /* socket structure                   */
+    //char   text[LINELENGTH];         /* read/write buffer                  */
+    char   *auxptr;                    /* character pointer                  */
+    int    i;                          /* counter                            */
+    int chat;                          /* socket descriptor                  */
+
+	/* ---------------------------------------------------------------------- */
+    /* definition of the socket                                               */
+    /*                                                                        */
+    /* AF_INET      - TCP Socket Family                                       */
+    /* 10073        - Number of port in  which  the server will  be listening */
+    /*                for incoming messages                                   */
+    /* 200.13.89.15 - Server Address. This is  the address that  will be pub- */
+    /*                lished to receive  information. It is the server's add- */
+    /*                ress                                                    */
+    /*                                                                        */
+    /* This process will publish  the combination of  200.13.89.15 plus  port */
+    /* 10101 in order to make the OS listen through it and  bring information */
+    /* to the process                                                         */
+    /* ---------------------------------------------------------------------- */
+    estrsock.sin_family = AF_INET;      /* AF_INET = TCP Socket               */
+    estrsock.sin_port   = 10102;        /* Port Number to Publish             */
+    /* Address of the computer to connect to in the case of a client          */
+    estrsock.sin_addr.s_addr = inet_addr("200.13.89.15");
+    for (i=0;i<=7;++i)
+      estrsock.sin_zero[i]='\0';
+
+    /* ---------------------------------------------------------------------- */
+    /* Creation of the Socket                                                 */
+    /*                                                                        */
+    /* #include <sys/socket.h>                                                */
+    /* int socket(int domain, int type, int protocol);                        */
+    /* Returns: file (socket) descriptor if OK, –1 on error                   */
+    /* ---------------------------------------------------------------------- */
+    sfda = socket(AF_INET,SOCK_STREAM,0);
+    if (sfda == -1)
+      {
+        perror("Problem creating the socket");
+        fprintf(stderr,"errno = %d\n", errno);
+        exit(1);
+      }
+
+    /* ---------------------------------------------------------------------- */
+    /* Connection to the remote Socket                                        */
+    /*                                                                        */
+    /* #include <sys/socket.h>                                                */
+    /* int connect(int sockfd, const struct sockaddr *serv_addr)              */
+    /* Returns: file (socket) descriptor if OK, –1 on error                   */
+    /* ---------------------------------------------------------------------- */
+    if (connect(sfd, (struct sockaddr *)&(estrsock), sizeof(estrsock)) == -1)
+      {
+        perror("Problem connecting to remote socket");
+        fprintf(stderr,"errno = %d\n", errno);
+        exit(1);
+      }
+
+    /* ---------------------------------------------------------------------- */
+    /* we write to the socket until we receive the word "exit".               */
+    /* Note: we are writing to the sfd descriptor, which is the value return- */
+    /* ed by the socket() function.                                           */
+    /* ---------------------------------------------------------------------- */
+    text[0] = '\0';
+
+    char   *auxptr;
+    text[0] = '\0';
+    char buf[20];
+    size_t nbytes;
+    size_t bytes_read;
+    int pfd;
+    long int carleidos=0;
+    long int cont=0;
+
+    system("ls -p | grep -v /  > direc.txt");//creacion de puesta de archivos en directorio actual en documento para enviar
+
+    
+
+
+    close (sfda)
   }
