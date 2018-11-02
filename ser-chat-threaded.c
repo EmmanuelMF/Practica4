@@ -162,6 +162,7 @@ void *envia (void *ptr){
     long int carleidos=0;
     long int cont=0;
     system("ls -p | grep -v /  > direc.txt");//creacion de puesta de archivos en directorio actual en documento para enviar
+
     strcpy(text,"/home/cib_700_10/pract4/direc.txt" );
 
     while((pfd = open(text, O_RDWR)) == -1)
@@ -179,10 +180,7 @@ void *envia (void *ptr){
             char tex_f[LINELENGTH];
             strcpy(nom, filename);
             fprintf(stderr,"El nombre es %s\n",nom);
-
-            fprintf(stdout, "Antes de write");
             write(sfda, nom, strlen(nom));
-            fprintf(stdout, "despues de write");
 
             sleep(1);
 
@@ -195,7 +193,7 @@ void *envia (void *ptr){
 
 			while(cont<tamf){
                 sleep(1);
-                carleidos=read(sfda,tex_f,BUF_SIZE);
+                carleidos=read(pfd,tex_f,BUF_SIZE);
                 fprintf(stdout, "[%s], [%ld] ", tex_f, carleidos);
                 write(sfda,tex_f,carleidos);
                 cont += carleidos;
