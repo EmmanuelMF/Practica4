@@ -22,6 +22,7 @@
 #include <sys/types.h>                 /* shared data types                   */
 #include <stdio.h>                     /* standard input/output               */
 #include <unistd.h>                    /* unix standard functions             */
+#include <stdlib.h>                    /* Unix System Libraries              */
 #include <string.h>                    /* text handling functions             */
 #include <pthread.h>                   /* libraries for thread handling       */
 #include <sys/types.h>
@@ -88,6 +89,162 @@ struct msg queue[MAX_MESSAGES];        /* list of messages to process         */
 int    sfd;                            /* socket descriptor                   */
 pthread_mutex_t msg_mutex = PTHREAD_MUTEX_INITIALIZER;    /* Mutual exclusion */
 
+void *envia (void *ptr){
+    struct sockaddr_in estrsock;       /* socket structure                   */
+    char path[LINELENGTH];  //text[LINELENGTH];         /* read/write buffer                  */
+    int    read_char;                  /* read characters                     */
+    char   *auxptr;                    /* character pointer                  */
+    int    i;                          /* counter                            */
+    int chat;                          /* socket descriptor                  */
+
+	  /* ---------------------------------------------------------------------- */
+    /* definition of the socket                                               */
+    /*                                                                        */
+    /* AF_INET      - TCP Socket Family                                       */
+    /* 10073        - Number of port in  which  the server will  be listening */
+    /*                for incoming messages                                   */
+    /* 200.13.89.15 - Server Address. This is  the address that  will be pub- */
+    /*                lished to receive  information. It is the server's add- */
+    /*                ress                                                    */
+    /*                                                                        */
+    /* This process will publish  the combination of  200.13.89.15 plus  port */
+    /* 10101 in order to make the OS listen through it and  bring information */
+    /* to the process                                                         */
+    /* ---------------------------------------------------------------------- */
+    estrsock.sin_family = AF_INET;      /* AF_INET = TCP Socket               */
+    estrsock.sin_port   = 10102;        /* Port Number to Publish             */
+    /* Address of the computer to connect to in the case of a client          */
+    estrsock.sin_addr.s_addr = inet_addr("200.13.89.14");
+    for (i=0;i<=7;++i)
+      estrsock.sin_zero[i]='\0';
+
+    /* ---------------------------------------------------------------------- */
+    /* Creation of the Socket                                                 */
+    /*                                                                        */
+    /* #include <sys/socket.h>                                                */
+    /* int socket(int domain, int type, int protocol);                        */
+    /* Returns: file (socket) descriptor if OK, –1 on error                   */
+    /* ---------------------------------------------------------------------- */
+    sfda = socket(AF_INET,SOCK_STREAM,0);
+    if (sfda == -1)
+      {
+        perror("Problem creating the socket");
+        fprintf(stderr,"errno = %d\n", errno);
+        exit(1);
+      }
+
+    /* ---------------------------------------------------------------------- */
+    /* Connection to the remote Socket                                        */
+    /*                                                                        */
+    /* #include <sys/socket.h>                                                */
+    /* int connect(int sockfd, const struct sockaddr *serv_addr)              */
+    /* Returns: file (socket) descriptor if OK, –1 on error                   */
+    /* ---------------------------------------------------------------------- */
+    if (connect(sfd, (struct sockaddr *)&(estrsock), sizeof(estrsock)) == -1)
+      {
+        perror("Problem connecting to remote socket");
+        fprintf(stderr,"errno = %d\n", errno);
+        exit(1);
+      }
+
+    /* ---------------------------------------------------------------------- */
+    /* we write to the socket until we receive the word "exit".               */
+    /* Note: we are writing to the sfd descriptor, which is the value return- */
+    /* ed by the socket() function.                                           */
+    /* ---------------------------------------------------------------------- */
+    text[0] = '\0';
+     path[0]= '\0';
+    text[0] = '\0';
+    char buf[20];
+    size_t nbytes;
+    size_t bytes_read;
+    int pfd;
+    long int carleidos=0;
+    long int cont=0;
+    system("ls -p | grep -v /  > direc.txt");//creacion de puesta de archivos en directorio actual en documento para enviar
+    strcpy(text,"/home/cib_700_10/pract4/direc.txt" );
+    while((pfd = open(text, O_RDWR)) == -1)
+    {
+      fprintf(stdout, "Generating file\n");
+    }
+
+
+    if(stat(text,&archivo)== 0) //EXITO
+		{
+			char* local_file = text;
+            char* ts2 = strdup(local_file);
+            char* filename = basename(ts2);
+            char nom[LINELENGTH];
+            char tex_f[LINELENGTH];
+            strcpy(nom, filename);
+            fprintf(stderr,"El nombre es %s\n",nom);
+            write(sfda, nom, strlen(nom));
+
+            sleep(1);
+
+			long int tamf=archivo.st_size;
+			fprintf(stdout,"tamaño es %ld\n",tamf);
+			write(sfda, &tamf, sizeof(long int));
+			///ESCRITURA EN SOCKET DE LEIDO
+
+			fprintf(stdout,"tamf-[%ld], cont-[%ld], carleidos-[%ld]\n", tamf, cont, carleidos);
+
+			while(cont<tamf){
+                sleep(1);
+                carleidos=read(sfda,tex_f,BUF_SIZE);
+                fprintf(stdout, "[%s], [%ld] ", tex_f, carleidos);
+                write(sfda,tex_f,carleidos);
+                cont += carleidos;
+                fprintf(stdout, "[%ld]\n ", cont);
+                //printf("$ teclee enter para seguir");
+                //fgets(text, LINELENGTH, stdin);
+            }
+    }
+
+            read_char= read(sfda,text,LINELENGTH-1);//lectura de titulo de archivo deseado, se puede presindir de estas lineas
+            text[read_char] = '\0';
+              strcpy(path, "/home/cib_700_10/pract4/");
+
+                fprintf(stdout, "Nombre de archivo :[%s]\n",text);
+
+                strcat(path,text);
+
+                fprintf(stdout, "ruta de enviado :[%s]\n",path);
+
+                if(stat(path,&archivo)== 0) //EXITO
+		{
+			char* local_file = path;
+            char* ts2 = strdup(local_file);
+            char* filename = basename(ts2);
+            char nom[LINELENGTH];
+            char tex_f[LINELENGTH];
+            strcpy(nom, filename);
+            fprintf(stderr,"El nombre es %s\n",nom);
+            write(sfda, nom, strlen(nom));
+
+            sleep(1);
+
+			long int tamf=archivo.st_size;
+			fprintf(stdout,"tamaño es %ld\n",tamf);
+			write(sfd, &tamf, sizeof(long int));
+			///ESCRITURA EN SOCKET DE LEIDO
+
+			fprintf(stdout,"tamf-[%ld], cont-[%ld], carleidos-[%ld]\n", tamf, cont, carleidos);
+
+			while(cont<tamf){
+                sleep(1);
+                carleidos=read(pfd,tex_f,BUF_SIZE);
+                fprintf(stdout, "[%s], [%ld] ", tex_f, carleidos);
+                write(sfda,tex_f,carleidos);
+                cont += carleidos;
+                fprintf(stdout, "[%ld]\n ", cont);
+                //printf("$ teclee enter para seguir");
+                //fgets(text, LINELENGTH, stdin);
+            }
+    }
+    close (sfda);
+   }
+
   
 /* -------------------------------------------------------------------------- */
 /* send_message()                                                             */
@@ -105,11 +262,11 @@ void *send_message(void *ptr)
     while(1)
       {
         /* first we  are going to look in the message queue for the next chat */
-	/* message to process                                                 */
+	      /* message to process                                                 */
         /* --- block message queue --- */
         pthread_mutex_lock(&msg_mutex);
 
-	for (c_i=0; c_i < MAX_MESSAGES; ++c_i)
+	    for (c_i=0; c_i < MAX_MESSAGES; ++c_i)
 	  if (queue[c_i].chat_id != -1) break;
 	
 	/* if i < MAX_MESSAGES, it means  that there is a message to process  */
@@ -145,7 +302,7 @@ void *send_message(void *ptr)
 /* main function of the system                                                */
 /* -------------------------------------------------------------------------- */
 main()
-  {
+{
     struct sockaddr_in sock_read;      /* structure for the read socket       */
     struct sockaddr_in sock_write;     /* structure for the write socket      */
     struct data message;               /* message to sendto the server        */
@@ -235,7 +392,7 @@ main()
               }
             else if(strcmp(message.data_text,"remote_dir")==0)
             {
-               iret1[4] = pthread_create( &(thread1[4]), NULL,envia );//agregar nombre de funcion de recibimiento de archivo, recibimiento de parmetros en funcion debe ser void
+               iret1[4] = pthread_create( &(thread1[4]), NULL,envia,  (void *)(&sfd) );//agregar nombre de funcion de recibimiento de archivo, recibimiento de parmetros en funcion debe ser void
             }
             else
               sprintf(text1,"[%s]:[%s]",part_list[message.chat_id].alias, message.data_text);
@@ -279,158 +436,4 @@ main()
     pthread_mutex_destroy(&msg_mutex);
     return(0);
   }
-
-  void *envia (){
-    struct sockaddr_in estrsock;       /* socket structure                   */
-    char path[LINELENGTH];  //text[LINELENGTH];         /* read/write buffer                  */
-    int    read_char;                  /* read characters                     */
-    char   *auxptr;                    /* character pointer                  */
-    int    i;                          /* counter                            */
-    int chat;                          /* socket descriptor                  */
-
-	/* ---------------------------------------------------------------------- */
-    /* definition of the socket                                               */
-    /*                                                                        */
-    /* AF_INET      - TCP Socket Family                                       */
-    /* 10073        - Number of port in  which  the server will  be listening */
-    /*                for incoming messages                                   */
-    /* 200.13.89.15 - Server Address. This is  the address that  will be pub- */
-    /*                lished to receive  information. It is the server's add- */
-    /*                ress                                                    */
-    /*                                                                        */
-    /* This process will publish  the combination of  200.13.89.15 plus  port */
-    /* 10101 in order to make the OS listen through it and  bring information */
-    /* to the process                                                         */
-    /* ---------------------------------------------------------------------- */
-    estrsock.sin_family = AF_INET;      /* AF_INET = TCP Socket               */
-    estrsock.sin_port   = 10102;        /* Port Number to Publish             */
-    /* Address of the computer to connect to in the case of a client          */
-    estrsock.sin_addr.s_addr = inet_addr("200.13.89.14");
-    for (i=0;i<=7;++i)
-      estrsock.sin_zero[i]='\0';
-
-    /* ---------------------------------------------------------------------- */
-    /* Creation of the Socket                                                 */
-    /*                                                                        */
-    /* #include <sys/socket.h>                                                */
-    /* int socket(int domain, int type, int protocol);                        */
-    /* Returns: file (socket) descriptor if OK, –1 on error                   */
-    /* ---------------------------------------------------------------------- */
-    sfda = socket(AF_INET,SOCK_STREAM,0);
-    if (sfda == -1)
-      {
-        perror("Problem creating the socket");
-        fprintf(stderr,"errno = %d\n", errno);
-        exit(1);
-      }
-
-    /* ---------------------------------------------------------------------- */
-    /* Connection to the remote Socket                                        */
-    /*                                                                        */
-    /* #include <sys/socket.h>                                                */
-    /* int connect(int sockfd, const struct sockaddr *serv_addr)              */
-    /* Returns: file (socket) descriptor if OK, –1 on error                   */
-    /* ---------------------------------------------------------------------- */
-    if (connect(sfd, (struct sockaddr *)&(estrsock), sizeof(estrsock)) == -1)
-      {
-        perror("Problem connecting to remote socket");
-        fprintf(stderr,"errno = %d\n", errno);
-        exit(1);
-      }
-
-    /* ---------------------------------------------------------------------- */
-    /* we write to the socket until we receive the word "exit".               */
-    /* Note: we are writing to the sfd descriptor, which is the value return- */
-    /* ed by the socket() function.                                           */
-    /* ---------------------------------------------------------------------- */
-    text[0] = '\0';
-  path[0]= '\0';
-    char   *auxptr;
-    text[0] = '\0';
-    char buf[20];
-    size_t nbytes;
-    size_t bytes_read;
-    int pfd;
-    long int carleidos=0;
-    long int cont=0;
-    system("ls -p | grep -v /  > direc.txt");//creacion de puesta de archivos en directorio actual en documento para enviar
-    strcpy(text"/home/cib_700_10/pract4/direc.txt", )
-    while((pfd = open(text, O_RDWR)) == -1)
-    {
-      fprintf(stdout, "Generating file\n");
-    }
-
-
-    if(stat(text,&archivo)== 0) //EXITO
-		{
-			char* local_file = text;
-            char* ts2 = strdup(local_file);
-            char* filename = basename(ts2);
-            char nom[LINELENGTH];
-            char tex_f[LINELENGTH];
-            strcpy(nom, filename);
-            fprintf(stderr,"El nombre es %s\n",nom);
-            write(sfda, nom, strlen(nom));
-
-            sleep(1);
-
-			long int tamf=archivo.st_size;
-			fprintf(stdout,"tamaño es %ld\n",tamf);
-			write(sfda, &tamf, sizeof(long int));
-			///ESCRITURA EN SOCKET DE LEIDO
-
-			fprintf(stdout,"tamf-[%ld], cont-[%ld], carleidos-[%ld]\n", tamf, cont, carleidos);
-
-			while(cont<tamf){
-                sleep(1);
-                carleidos=read(sfda,tex_f,BUF_SIZE);
-                fprintf(stdout, "[%s], [%ld] ", tex_f, carleidos);
-                write(sfda,tex_f,carleidos);
-                cont += carleidos;
-                fprintf(stdout, "[%ld]\n ", cont);
-                //printf("$ teclee enter para seguir");
-                //fgets(text, LINELENGTH, stdin);
-            }
-
-            read_char= read(sfda,text,LINELENGTH-1);//lectura de titulo de archivo deseado, se puede presindir de estas lineas
-            text[read_char] = '\0';
-strcpy(path, "/home/cib_700_10/pract4/");
-
-                fprintf(stdout, "Nombre de archivo :[%s]\n",text);
-
-                strcat(path,text);
-
-                fprintf(stdout, "ruta de enviado :[%s]\n",path);
-
-                if(stat(path,&archivo)== 0) //EXITO
-		{
-			char* local_file = path;
-            char* ts2 = strdup(local_file);
-            char* filename = basename(ts2);
-            char nom[LINELENGTH];
-            char tex_f[LINELENGTH];
-            strcpy(nom, filename);
-            fprintf(stderr,"El nombre es %s\n",nom);
-            write(sfda, nom, strlen(nom));
-
-            sleep(1);
-
-			long int tamf=archivo.st_size;
-			fprintf(stdout,"tamaño es %ld\n",tamf);
-			write(sfd, &tamf, sizeof(long int));
-			///ESCRITURA EN SOCKET DE LEIDO
-
-			fprintf(stdout,"tamf-[%ld], cont-[%ld], carleidos-[%ld]\n", tamf, cont, carleidos);
-
-			while(cont<tamf){
-                sleep(1);
-                carleidos=read(pfd,tex_f,BUF_SIZE);
-                fprintf(stdout, "[%s], [%ld] ", tex_f, carleidos);
-                write(sfda,tex_f,carleidos);
-                cont += carleidos;
-                fprintf(stdout, "[%ld]\n ", cont);
-                //printf("$ teclee enter para seguir");
-                //fgets(text, LINELENGTH, stdin);
-            }
-    close (sfda)
-  }
+    
