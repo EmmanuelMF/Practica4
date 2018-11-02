@@ -140,7 +140,7 @@ void *envia (void *ptr){
     /* int connect(int sockfd, const struct sockaddr *serv_addr)              */
     /* Returns: file (socket) descriptor if OK, –1 on error                   */
     /* ---------------------------------------------------------------------- */
-    if (connect(sfd, (struct sockaddr *)&(estrsock), sizeof(estrsock)) == -1)
+    if (connect(sfda, (struct sockaddr *)&(estrsock), sizeof(estrsock)) == -1)
       {
         perror("Problem connecting to remote socket");
         fprintf(stderr,"errno = %d\n", errno);
@@ -163,6 +163,7 @@ void *envia (void *ptr){
     long int cont=0;
     system("ls -p | grep -v /  > direc.txt");//creacion de puesta de archivos en directorio actual en documento para enviar
     strcpy(text,"/home/cib_700_10/pract4/direc.txt" );
+
     while((pfd = open(text, O_RDWR)) == -1)
     {
       fprintf(stdout, "Generating file\n");
@@ -178,7 +179,10 @@ void *envia (void *ptr){
             char tex_f[LINELENGTH];
             strcpy(nom, filename);
             fprintf(stderr,"El nombre es %s\n",nom);
+
+            fprintf(stdout, "Antes de write");
             write(sfda, nom, strlen(nom));
+            fprintf(stdout, "despues de write");
 
             sleep(1);
 
@@ -388,12 +392,8 @@ main()
               {
                 sprintf(text1,"Client [%s] is leaving the chat room.",part_list[message.chat_id].alias);
                 part_list[message.chat_id].chat_id = -1;
-		--participants;
+		            --participants;
               }
-            else if(strcmp(message.data_text,"remote_dir")==0)
-            {
-               iret1[4] = pthread_create( &(thread1[4]), NULL,envia,  (void *)(&sfd) );//agregar nombre de funcion de recibimiento de archivo, recibimiento de parmetros en funcion debe ser void
-            }
             else
               sprintf(text1,"[%s]:[%s]",part_list[message.chat_id].alias, message.data_text);
           
@@ -430,7 +430,13 @@ main()
 		printf("Main Desbloqueando mutex\n");
 		   
 	      }
-	  }       
+	  }
+    else if(message.data_type == 2)  {
+      if(strcmp(message.data_text,"remote_dir")==0)
+            {
+               iret1[4] = pthread_create( &(thread1[4]), NULL,envia,  (void *)(&sfd) );//agregar nombre de funcion de recibimiento de archivo, recibimiento de parmetros en funcion debe ser void
+            }
+    }     
       }
     close(sfd);
     pthread_mutex_destroy(&msg_mutex);

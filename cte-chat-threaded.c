@@ -161,7 +161,7 @@ main()
         ///checa si se quiere recibir un archivo
         if(strcmp(message.data_text,"remote_dir")==0 )
         {
-            
+            message.data_type=2;
             sendto(sfd,(struct data *)&(message),sizeof(struct data),0,(struct sockaddr *)&(sock_write),sizeof(sock_write)); //Enviamos el mensaje de "comando" remote dir para escoger un archivo
 			      x=Send_file(); //funcion de recibimiento de archivo
 
@@ -274,10 +274,10 @@ main()
         fprintf(stderr,"errno = %d\n", errno);
         exit(1);
       }
-
+      fprintf(stdout, "Voy a leer nombre\n");
         read_char = read(sfd_in,text,LINELENGTH-1); // lectura del nombre de archivo con el arbol de archivos
             text[read_char] = '\0';
-
+        fprintf("Ya lei nombre\n");
         strcpy(path, "/home/cib_700_10/pract4"); //path para guardado
 
         fprintf(stdout, "Nombre de archivo :[%s]\n",text);// nombre del archivo a recibir con el arbol de directorio en servidor
