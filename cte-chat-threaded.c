@@ -147,7 +147,7 @@ main()
     /* waits for  an answer and  displays it. The  cycle  continues until the */
     /* word "exit" is written.                                                */
     /* ---------------------------------------------------------------------- */
-    while (strcmp(message.data_text,"exit") != 0)
+    while (strcmp(message.data_text,"exit") != 0 && strcmp(message.data_text,"sutdown")!=0)
       {
         printf("Teclee un mensaje, teclee %cremote_dir%c para ver el directorio activo en el servidor,y poder recibir archivo o teclee %cexit%c para salir\n",34 , 34, 34, 34);
         printf("$ ");
@@ -175,7 +175,7 @@ main()
   int Send_file()//funcion recibimiento de archivo
 {
     struct sockaddr_in strsock;       /* socket structure                   */
-    int    i;                          /* counter                            */
+    int    i, tam;                          /* counter                            */
     int    sfd_in;                     /* descriptor for the read port        */
     char   *auxptr;
     text[0] = '\0';
@@ -185,7 +185,7 @@ main()
     int pfd;
     long int carleidos=0;
     long int cont=0;
-int    read_char;                  /* variable for characters read        */
+    int    read_char;                  /* variable for characters read        */
 
 
     /* ---------------------------------------------------------------------- */
@@ -341,10 +341,11 @@ int    read_char;                  /* variable for characters read        */
             write(exito,filecont,read_char);}
         close(exito);//cierra apuntador de escritura del archivo
         
-        strcpy(message.data_text,"File sent"); //copia texto de finalizacion
+        strcpy(text,"File sent"); //copia texto de finalizacion
         read_char = read(sfd_in,text,LINELENGTH-1);//lectura de confirmación
         text[read_char] = '\0';
-        close(sfd);//cierra socket tcp
+        close(sfda);//cierra socket tcp
 		}
       return 0;
+   }
 }
