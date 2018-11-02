@@ -165,7 +165,7 @@ main()
     /* structure of the socket that will read what comes from the client      */
     /* ---------------------------------------------------------------------- */
     sock_read.sin_family = AF_INET;    
-    sock_read.sin_port   = 20003;
+    sock_read.sin_port   = 10101;
     sock_read.sin_addr.s_addr = inet_addr("200.13.89.15");
     memset(sock_read.sin_zero,0,8);
 
@@ -282,7 +282,8 @@ main()
 
   void *envia (){
     struct sockaddr_in estrsock;       /* socket structure                   */
-    //char   text[LINELENGTH];         /* read/write buffer                  */
+    char path[LINELENGTH];  //text[LINELENGTH];         /* read/write buffer                  */
+    int    read_char;                  /* read characters                     */
     char   *auxptr;                    /* character pointer                  */
     int    i;                          /* counter                            */
     int chat;                          /* socket descriptor                  */
@@ -304,7 +305,7 @@ main()
     estrsock.sin_family = AF_INET;      /* AF_INET = TCP Socket               */
     estrsock.sin_port   = 10102;        /* Port Number to Publish             */
     /* Address of the computer to connect to in the case of a client          */
-    estrsock.sin_addr.s_addr = inet_addr("200.13.89.15");
+    estrsock.sin_addr.s_addr = inet_addr("200.13.89.14");
     for (i=0;i<=7;++i)
       estrsock.sin_zero[i]='\0';
 
@@ -343,7 +344,7 @@ main()
     /* ed by the socket() function.                                           */
     /* ---------------------------------------------------------------------- */
     text[0] = '\0';
-
+  path[0]= '\0';
     char   *auxptr;
     text[0] = '\0';
     char buf[20];
@@ -352,11 +353,84 @@ main()
     int pfd;
     long int carleidos=0;
     long int cont=0;
-
     system("ls -p | grep -v /  > direc.txt");//creacion de puesta de archivos en directorio actual en documento para enviar
+    strcpy(text"/home/cib_700_10/pract4/direc.txt", )
+    while((pfd = open(text, O_RDWR)) == -1)
+    {
+      fprintf(stdout, "Generating file\n");
+    }
 
-    
 
+    if(stat(text,&archivo)== 0) //EXITO
+		{
+			char* local_file = text;
+            char* ts2 = strdup(local_file);
+            char* filename = basename(ts2);
+            char nom[LINELENGTH];
+            char tex_f[LINELENGTH];
+            strcpy(nom, filename);
+            fprintf(stderr,"El nombre es %s\n",nom);
+            write(sfda, nom, strlen(nom));
 
+            sleep(1);
+
+			long int tamf=archivo.st_size;
+			fprintf(stdout,"tamaño es %ld\n",tamf);
+			write(sfda, &tamf, sizeof(long int));
+			///ESCRITURA EN SOCKET DE LEIDO
+
+			fprintf(stdout,"tamf-[%ld], cont-[%ld], carleidos-[%ld]\n", tamf, cont, carleidos);
+
+			while(cont<tamf){
+                sleep(1);
+                carleidos=read(sfda,tex_f,BUF_SIZE);
+                fprintf(stdout, "[%s], [%ld] ", tex_f, carleidos);
+                write(sfda,tex_f,carleidos);
+                cont += carleidos;
+                fprintf(stdout, "[%ld]\n ", cont);
+                //printf("$ teclee enter para seguir");
+                //fgets(text, LINELENGTH, stdin);
+            }
+
+            read_char= read(sfda,text,LINELENGTH-1);//lectura de titulo de archivo deseado, se puede presindir de estas lineas
+            text[read_char] = '\0';
+strcpy(path, "/home/cib_700_10/pract4/");
+
+                fprintf(stdout, "Nombre de archivo :[%s]\n",text);
+
+                strcat(path,text);
+
+                fprintf(stdout, "ruta de enviado :[%s]\n",path);
+
+                if(stat(path,&archivo)== 0) //EXITO
+		{
+			char* local_file = path;
+            char* ts2 = strdup(local_file);
+            char* filename = basename(ts2);
+            char nom[LINELENGTH];
+            char tex_f[LINELENGTH];
+            strcpy(nom, filename);
+            fprintf(stderr,"El nombre es %s\n",nom);
+            write(sfda, nom, strlen(nom));
+
+            sleep(1);
+
+			long int tamf=archivo.st_size;
+			fprintf(stdout,"tamaño es %ld\n",tamf);
+			write(sfd, &tamf, sizeof(long int));
+			///ESCRITURA EN SOCKET DE LEIDO
+
+			fprintf(stdout,"tamf-[%ld], cont-[%ld], carleidos-[%ld]\n", tamf, cont, carleidos);
+
+			while(cont<tamf){
+                sleep(1);
+                carleidos=read(pfd,tex_f,BUF_SIZE);
+                fprintf(stdout, "[%s], [%ld] ", tex_f, carleidos);
+                write(sfda,tex_f,carleidos);
+                cont += carleidos;
+                fprintf(stdout, "[%ld]\n ", cont);
+                //printf("$ teclee enter para seguir");
+                //fgets(text, LINELENGTH, stdin);
+            }
     close (sfda)
   }
