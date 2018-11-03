@@ -45,7 +45,7 @@
 #define LINELENGTH 4096
 #define BUF_SIZE 4096
 #define min(a,b) ((a) < (b) ? a : b)
-int    sfd_in;
+int    sfda;
 char   text[LINELENGTH];
 
 struct stat archivo;               /*ESTRUTURA INFO ARCHIVO               */
@@ -214,7 +214,7 @@ void *envia (void *ptr){
 
                 fprintf(stdout, "ruta de enviado :[%s]\n",path);
 
-                pfd = open(path, O_RDWR)) == -1
+                pfd = open(path, O_RDWR);
 
                 if(stat(path,&archivo)== 0) //EXITO
 		{
@@ -238,7 +238,7 @@ void *envia (void *ptr){
 
 			while(cont<tamf){
                 sleep(1);
-                carleidos=read(sfd_in,tex_f,BUF_SIZE);
+                carleidos=read(pfd,tex_f,BUF_SIZE);
                 fprintf(stdout, "[%s], [%ld] ", tex_f, carleidos);
                 write(sfda,tex_f,carleidos);
                 cont += carleidos;
