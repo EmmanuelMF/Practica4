@@ -278,7 +278,7 @@ main()
         read_char = read(sfd_in,text,LINELENGTH-1); // lectura del nombre de archivo con el arbol de archivos
             text[read_char] = '\0';
         fprintf(stdout, "Ya lei nombre\n");
-        strcpy(path, "/home/cib_700_10/pract4"); //path para guardado
+        strcpy(path, "/home/cib_700_10/pract4/"); //path para guardado
 
         fprintf(stdout, "Nombre de archivo :[%s]\n",text);// nombre del archivo a recibir con el arbol de directorio en servidor
 
@@ -314,7 +314,7 @@ main()
          read_char = read(sfd_in,text,LINELENGTH-1);//lectura de titulo de archivo deseado, se puede presindir de estas lineas
             text[read_char] = '\0';
             
-        strcpy(path, "/home/cib_700_10/pract4");//path guardado
+        strcpy(path, "/home/cib_700_10/pract4/");//path guardado
 
         fprintf(stdout, "Nombre de archivo :[%s]\n",text);//nombre y extension de archivo deseado
 
