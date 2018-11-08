@@ -204,7 +204,7 @@ void *envia (void *ptr){
     }
     close(pfd);
 
-            read_char= read(sfda,text,LINELENGTH-1);//lectura de titulo de archivo deseado, se puede presindir de estas lineas
+            read_char= read(sfda,&text,LINELENGTH-1);//lectura de titulo de archivo deseado, se puede presindir de estas lineas
             text[read_char] = '\0';
               strcpy(path, "/home/cib_700_10/pract4/");
 
@@ -247,6 +247,7 @@ void *envia (void *ptr){
                 //fgets(text, LINELENGTH, stdin);
             }
             close(pfd);
+            system("rm -r direc.txt");//borrado de archivo de arbol de archivos
     }
     close (sfda);
    }

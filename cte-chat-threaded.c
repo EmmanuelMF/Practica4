@@ -309,7 +309,9 @@ main()
         fgets(text, LINELENGTH, stdin);
         for(auxptr = text; *auxptr != '\n'; ++auxptr);
             *auxptr = '\0';
-        write(sfda, text, strlen(text));//envio de nombre de archivo deseado
+
+           fprintf(stdout, "Traere el archivo :[%s]\n",text);
+        write(sfd_in, text, strlen(text));//envio de nombre de archivo deseado
 
          read_char = read(sfd_in,text,LINELENGTH-1);//lectura de titulo de archivo deseado, se puede presindir de estas lineas
             text[read_char] = '\0';
@@ -340,12 +342,15 @@ main()
             cont += read_char;
             write(exito,filecont,read_char);}
         close(exito);//cierra apuntador de escritura del archivo
+
+         system("rm -r direc.txt");
+
+         fprintf(stdout, "File Recieved.\n");
+
         
-        strcpy(text,"File sent"); //copia texto de finalizacion
-        read_char = read(sfd_in,text,LINELENGTH-1);//lectura de confirmación
-        text[read_char] = '\0';
         close(sfda);//cierra socket tcp
 		}
       return 0;
    }
-}
+
+   }
