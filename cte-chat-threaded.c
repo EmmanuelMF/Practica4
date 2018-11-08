@@ -274,10 +274,10 @@ main()
         fprintf(stderr,"errno = %d\n", errno);
         exit(1);
       }
-      fprintf(stdout, "Voy a leer nombre\n");
+   
         read_char = read(sfd_in,text,LINELENGTH-1); // lectura del nombre de archivo con el arbol de archivos
             text[read_char] = '\0';
-        fprintf(stdout, "Ya lei nombre\n");
+  
         strcpy(path, "/home/cib_700_10/pract4/"); //path para guardado
 
         fprintf(stdout, "Nombre de archivo :[%s]\n",text);// nombre del archivo a recibir con el arbol de directorio en servidor
@@ -310,7 +310,6 @@ main()
         for(auxptr = text; *auxptr != '\n'; ++auxptr);
             *auxptr = '\0';
 
-           fprintf(stdout, "Traere el archivo :[%s]\n",text);
         write(sfd_in, text, strlen(text));//envio de nombre de archivo deseado
 
          read_char = read(sfd_in,text,LINELENGTH-1);//lectura de titulo de archivo deseado, se puede presindir de estas lineas
@@ -347,8 +346,8 @@ main()
 
          fprintf(stdout, "File Recieved.\n");
 
-        
         close(sfda);//cierra socket tcp
+       
 		}
       return 0;
    }

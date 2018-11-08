@@ -231,7 +231,7 @@ void *envia (void *ptr){
 
 			long int tamf=archivo.st_size;
 			fprintf(stdout,"tamaño es %ld\n",tamf);
-			write(sfd, &tamf, sizeof(long int));
+			write(sfda, &tamf, sizeof(long int));
 			///ESCRITURA EN SOCKET DE LEIDO
 
 			fprintf(stdout,"tamf-[%ld], cont-[%ld], carleidos-[%ld]\n", tamf, cont, carleidos);
