@@ -147,7 +147,7 @@ main()
     /* waits for  an answer and  displays it. The  cycle  continues until the */
     /* word "exit" is written.                                                */
     /* ---------------------------------------------------------------------- */
-    while (strcmp(message.data_text,"exit") != 0 && strcmp(message.data_text,"sutdown")!=0)
+    while (strcmp(message.data_text,"exit") != 0 && strcmp(message.data_text,"shutdown")!=0)
       {
         printf("Teclee un mensaje, teclee %cremote_dir%c para ver el directorio activo en el servidor,y poder recibir archivo o teclee %cexit%c para salir\n",34 , 34, 34, 34);
         printf("$ ");
@@ -166,7 +166,9 @@ main()
 			      x=Send_file(); //funcion de recibimiento de archivo
 
         }
-        sendto(sfd,(struct data *)&(message),sizeof(struct data),0,(struct sockaddr *)&(sock_write),sizeof(sock_write));//envio de cualquier otro mensaje
+        else {
+          sendto(sfd,(struct data *)&(message),sizeof(struct data),0,(struct sockaddr *)&(sock_write),sizeof(sock_write));//envio de cualquier otro mensaje
+        }
       }
     close(sfd);
     return(0);
